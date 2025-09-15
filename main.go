@@ -12,7 +12,7 @@ import (
 )
 
 type Backup interface {
-	AddFile(sourcePath, destionationPath string, compressionMethod string, scheduling string) error
+	AddFile(sourcePath, destionationPath, compressionMethod, scheduling, retainPolicy string) error
 	RemoveFile(destinationPath string) error
 	PrintFiles()
 	Sync() error
@@ -28,6 +28,7 @@ type Storage struct {
 type File struct {
 	sourcePath, destionationPath string
 	compressionMethod            string
+	retainPolicy                 string
 	scheduling                   string
 	synced                       bool
 }
@@ -40,11 +41,12 @@ func NewStorage(Volume int) *Storage {
 	}
 }
 
-func (s *Storage) AddFile(sourcePath, destionationPath, compressionMethod, scheduling string) error {
+func (s *Storage) AddFile(sourcePath, destionationPath, compressionMethod, scheduling, retainPolicy string) error {
 	file := File{sourcePath: sourcePath,
 		destionationPath:  "",
 		compressionMethod: compressionMethod,
 		scheduling:        scheduling,
+		retainPolicy:      retainPolicy,
 		synced:            false,
 	}
 
@@ -74,6 +76,10 @@ func (s *Storage) AddFile(sourcePath, destionationPath, compressionMethod, sched
 func (s *Storage) RemoveFile(destinationPath string) error {
 	for i := range s.Files {
 		if s.Files[i].destionationPath == destinationPath {
+			err := os.Remove(destinationPath)
+			if err != nil {
+				fmt.Println("Error deleting file:", err)
+			}
 			s.Files = append(s.Files[:i], s.Files[i+1:]...)
 			return nil
 		}
@@ -95,7 +101,7 @@ func main() {
 	s := NewStorage(10000)
 	c := schedule.NewCron()
 
-	s.AddFile("sample.txt", "backup/sample.txt", "gzip", "*/1 * * * *")
+	s.AddFile("sample.txt", "backup/sample.txt", "gzip", "*/1 * * * *", "1y")
 
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
