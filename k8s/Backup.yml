@@ -1,0 +1,30 @@
+apiVersion: backup.wispo.io/v1alpha1
+kind: Backup
+metadata:
+  name: sample-txt-backup
+spec:
+  source:
+    type: pvc # pvc | podPath | s3 | http
+    namespace: default
+    name: data-pvc
+    path: /data/sample.txt
+  destination:
+    type: pvc # pvc | s3
+    namespace: backups
+    name: backup-pvc
+    path: backup/sample.txt.gz
+  compression: gzip # gzip | zlib | none | zstd
+  schedule: "*/1 * * * *"
+  retention: "365d" # or ISO8601 / duration
+  concurrencyPolicy: Forbid
+  suspend: false
+
+
+status:
+  lastScheduledTime: "2025-09-15T12:00:00Z"
+  lastSuccessfulTime: "2025-09-15T12:01:00Z"
+  observedGeneration: 2
+  conditions:
+  - type: Ready
+    status: True
+    reason: Scheduled

@@ -1,0 +1,12 @@
+apiVersion: backup.wispo.io/v1alpha1
+kind: Storage
+metadata:
+  name: cluster-backups
+spec:
+  pvcRef:
+    namespace: backups
+    name: backup-pvc
+  capacity: 100Gi
+status:
+  used: 12Gi
+  free: 88Gi

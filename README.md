@@ -193,3 +193,11 @@ func (c *CronJob) AddNewJob(schedule string) {
 	}
 }
 ```
+
+
+# Kubernetes Operatores
+
+I didn't implement this part of project. I used chatGPT. 
+
+
+Thanks for your attention.
